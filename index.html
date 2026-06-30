@@ -733,15 +733,6 @@ window._fb={fbGet,fbSet,fbGetAll,fbGetAllSub,fbDeleteDoc};
 
 onAuthStateChanged(auth,async user=>{if(user&&!S.userId){await loadUserAfterAuth(user)}});
 
-// ═══ ⚠️ TEMP DEV BYPASS — للتجربة بس، شيلها قبل ما تنزل التطبيق فعلياً ⚠️ ═══
-window.DEV_BYPASS_LOGIN=true;
-if(window.DEV_BYPASS_LOGIN){
-  S.userId="dev_test_user";
-  S.userData={name:"تجربة",level:"beginner",streak:0,totalDays:0,history:{},freezes:1,freezesUsed:0,listenHours:0,wordsLearned:0,quizzesDone:0,assessDone:true,assessResult:null};
-  S.level="beginner";
-  setTimeout(()=>{loadCompletedSentences();showScreen("mainApp");goTab("home")},50);
-}
-
 // ═══ REDIRECT RESULT (Google/Apple redirect flow) ═══
 getRedirectResult(auth).then(async result=>{
   if(result&&result.user){
@@ -1200,4 +1191,8 @@ window.answerListening=function(clipIdx,optIdx){
   if(S.listenAnswered)return;S.listenAnswered=true;
   const clip=S.listenClips[clipIdx];const correct=optIdx===clip.ans;
   if(correct)S.listenScoreArr.push(1);else S.listenScoreArr.push(0);
-  document.querySelectorAll(`[id^="lopt-${clipIdx}-"]`)
+  document.querySelectorAll(`[id^="lopt-${clipIdx}-"]`).forEach(el=>{el.style.pointerEvents="none"});
+  const correctEl=document.getElementById(`lopt-${clipIdx}-${clip.ans}`);if(correctEl)correctEl.classList.add("correct");
+  if(!correct){const wrongEl=document.getElementById(`lopt-${clipIdx}-${optIdx}`);if(wrongEl)wrongEl.classList.add("wrong")}
+  const fb=document.getElementById(`listeningFeedback-${clipIdx}`);
+  if(fb){fb.style.display="block";fb.style.background=correct?"rgba(16,185,129,.1)":"rgba(239,
